@@ -1,0 +1,44 @@
+version: "3.8"
+services:
+  php-apache:
+    build: 
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+      - 9000:80
+    environment:
+      - g_hostname=mysql-db
+    depends_on:
+      - mysql-db
+    links:
+    - mysql-db
+
+  mysql-db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: bugtracker
+      MYSQL_USER: administrator
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_TCP_PORT: 3306
+    ports:
+      - 3308:3306
+  adminer:
+    image: adminer
+    ports:
+      - 8089:8080
+    links:
+    - mysql-db
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+        - '8070:80'
+    restart: always
+    environment:
+        PMA_HOST: mysql-db
+    depends_on:
+        - mysql-db
+    links:
+    - mysql-db
